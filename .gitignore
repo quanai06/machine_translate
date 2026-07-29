@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+
+# Checkpoint: best.pt ~151MB, last.pt ~454MB — GitHub chặn cứng file >100MB
+*.pt
+runs/*/
+runs/*.png
+
+# data/ (31MB) và tokenizer (1MB) được commit để `git clone` trên Colab là chạy
+# ngay. Muốn repo nhẹ thì bỏ comment 2 dòng dưới + chạy scripts/download_data.sh
+# data/iwslt15_en_vi/
+# data/tokenizer/
+
+.ipynb_checkpoints/
+.DS_Store

@@ -1,0 +1,66 @@
+{
+  "corpus": {
+    "train_en": {
+      "split": "train.en",
+      "sentences": 133317,
+      "tokens": 2706255,
+      "vocab_whitespace": 54169,
+      "avg_len": 20.3,
+      "p95_len": 47,
+      "max_len": 628,
+      "singletons": 21912
+    },
+    "train_vi": {
+      "split": "train.vi",
+      "sentences": 133317,
+      "tokens": 3311508,
+      "vocab_whitespace": 25615,
+      "avg_len": 24.84,
+      "p95_len": 59,
+      "max_len": 850,
+      "singletons": 11298
+    },
+    "dev_en": {
+      "split": "dev.en",
+      "sentences": 1553,
+      "tokens": 27983,
+      "vocab_whitespace": 3727,
+      "avg_len": 18.02,
+      "p95_len": 39,
+      "max_len": 93,
+      "singletons": 1967
+    },
+    "dev_vi": {
+      "split": "dev.vi",
+      "sentences": 1553,
+      "tokens": 34297,
+      "vocab_whitespace": 2487,
+      "avg_len": 22.08,
+      "p95_len": 47,
+      "max_len": 122,
+      "singletons": 928
+    },
+    "test_en": {
+      "split": "test.en",
+      "sentences": 1268,
+      "tokens": 26728,
+      "vocab_whitespace": 3917,
+      "avg_len": 21.08,
+      "p95_len": 49,
+      "max_len": 102,
+      "singletons": 2118
+    },
+    "test_vi": {
+      "split": "test.vi",
+      "sentences": 1268,
+      "tokens": 33682,
+      "vocab_whitespace": 2660,
+      "avg_len": 26.56,
+      "p95_len": 61,
+      "max_len": 123,
+      "singletons": 988
+    }
+  },
+  "vocab_size": 8000,
+  "model_type": "bpe"
+}
