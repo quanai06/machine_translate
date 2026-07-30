@@ -100,24 +100,53 @@ def speed_ratio(runs: dict[str, dict]) -> str:
     out = []
     a = tf["summary"].get("median_epoch_time_sec")
     b = s2s["summary"].get("median_epoch_time_sec")
+    pa = tf["summary"].get("params_total")
+    pb = s2s["summary"].get("params_total")
     if a and b:
-        out.append(
-            f"- Mỗi epoch, Transformer nhanh hơn **{b / a:.1f}×** so với Seq2Seq "
-            f"({a:.0f}s vs {b:.0f}s). Nguyên nhân là teacher forcing của "
-            f"Transformer chạy song song toàn bộ chuỗi target trong một lần, "
-            f"còn LSTM có input feeding buộc phải lặp tuần tự qua từng timestep."
-        )
+        ratio = b / a
+        if ratio > 1.3:
+            out.append(
+                f"- Mỗi epoch, Transformer nhanh hơn {ratio:.1f}× so với Seq2Seq "
+                f"({a:.0f}s vs {b:.0f}s). Teacher forcing của Transformer chạy song "
+                f"song toàn bộ chuỗi target trong một lần, còn LSTM có input feeding "
+                f"buộc phải lặp tuần tự qua từng timestep."
+            )
+        elif ratio < 0.77:
+            out.append(
+                f"- Mỗi epoch, Seq2Seq nhanh hơn {1 / ratio:.1f}× so với Transformer "
+                f"({b:.0f}s vs {a:.0f}s), dù chạy tuần tự — nhiều khả năng do chênh "
+                f"lệch số tham số và chi phí attention O(T²)."
+            )
+        else:
+            extra = ""
+            if pa and pb:
+                extra = (f" Seq2Seq chỉ có {pb / 1e6:.1f}M tham số so với "
+                         f"{pa / 1e6:.1f}M, tức khoảng {pa / pb:.1f}× ít phép tính "
+                         f"mỗi token, bù lại phần thiệt do chạy tuần tự;")
+            out.append(
+                f"- Thời gian mỗi epoch gần như bằng nhau ({a:.0f}s vs {b:.0f}s, lệch "
+                f"{abs(ratio - 1) * 100:.0f}%), ngược với kỳ vọng thông thường rằng "
+                f"Transformer phải nhanh hơn hẳn nhờ song song hoá.{extra} thêm nữa "
+                f"attention của Transformer tốn O(T²) theo độ dài câu. Ở quy mô model "
+                f"này, hai yếu tố triệt tiêu nhau."
+            )
     a = tf["summary"].get("decode_ms_per_sentence")
     b = s2s["summary"].get("decode_ms_per_sentence")
     if a and b:
-        rel = b / a
-        verdict = (f"nhanh hơn {rel:.1f}×" if rel > 1 else f"CHẬM hơn {1 / rel:.1f}×")
-        out.append(
-            f"- Khi SINH câu, Transformer {verdict} ({a:.0f} vs {b:.0f} ms/câu). "
-            f"Khoảng cách hẹp hơn nhiều so với lúc train, vì lúc sinh thì cả hai "
-            f"đều autoregressive; hơn nữa bản cài đặt Transformer ở đây không "
-            f"cache key/value nên mỗi bước phải attend lại toàn bộ tiền tố."
-        )
+        if a > b:
+            out.append(
+                f"- Khi SINH câu, Transformer chậm hơn {a / b:.1f}× ({a:.1f} vs "
+                f"{b:.1f} ms/câu). Đây là hạn chế của BẢN CÀI ĐẶT chứ không phải của "
+                f"kiến trúc: `greedy_decode` ở đây không cache key/value, nên mỗi bước "
+                f"sinh phải chạy lại decoder trên toàn bộ tiền tố, tổng chi phí O(T²). "
+                f"LSTM không gặp vấn đề này vì state đã tóm tắt sẵn quá khứ trong một "
+                f"vector. Thêm KV cache sẽ thu hẹp khoảng cách này."
+            )
+        else:
+            out.append(
+                f"- Khi SINH câu, Transformer nhanh hơn {b / a:.1f}× ({a:.1f} vs "
+                f"{b:.1f} ms/câu)."
+            )
     return "\n".join(out)
 
 

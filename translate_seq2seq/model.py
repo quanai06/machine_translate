@@ -16,9 +16,13 @@ Các thành phần bám sát Luong et al. 2015:
   tiếp. Đây là đóng góp riêng của Luong et al. (khác Bahdanau et al. 2015),
   giúp decoder "nhớ" mình đã căn chỉnh (align) vào đâu ở bước trước, tránh
   dịch lặp hoặc bỏ sót. Đổi lại, nó ép decoder chạy TUẦN TỰ theo timestep —
-  không thể song song hoá như Transformer. Đó chính là nguồn gốc chênh lệch
-  tốc độ train giữa hai case, và là một trong những điểm đáng phân tích nhất
-  trong báo cáo.
+  không thể song song hoá teacher forcing như Transformer.
+
+  Về lý thuyết đây là bất lợi tốc độ lớn, nhưng đo thực tế trên T4 thì hai
+  case gần bằng nhau (152 vs 144 giây/epoch). Model này chỉ có 20.0M tham số
+  so với 39.7M của Transformer, tức nửa khối lượng tính toán mỗi token, vừa
+  đủ bù phần thiệt do chạy tuần tự; thêm nữa attention của Transformer tốn
+  O(T²). Đừng suy từ kiến trúc ra tốc độ mà không đo.
 
 * **Encoder hai chiều**: cho mỗi vị trí nguồn một biểu diễn thấy được cả ngữ
   cảnh trái lẫn phải.

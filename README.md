@@ -2,6 +2,11 @@
 
 Cài đặt lại hai kiến trúc dịch máy trên cùng bộ IWSLT'15 En-Vi và so sánh.
 
+Lê Hoàng Quân — MSV 24022433 · https://github.com/quanai06/machine_translate
+
+**[Báo cáo đầy đủ →](report/BAO_CAO.md)** · [Bảng so sánh chi tiết →](results/COMPARISON.md)
+· [Nhật ký lần chạy trên Colab →](notebooks/translate_colab_run.ipynb)
+
 | | Case 1 | Case 2 |
 |---|---|---|
 | Kiến trúc | Transformer encoder-decoder | Seq2Seq LSTM + Luong attention |
@@ -154,7 +159,22 @@ sacrebleu mặc định cho ra một con số thứ ba, không so được với
 BLEU tính trên âm tiết ("học sinh" = 2 token), nhất quán với literature của bộ
 này, nhưng không so được với hệ thống có tách từ tiếng Việt.
 
-## Mốc đối chiếu (cùng tst2013)
+## Kết quả
+
+Đo trên tst2013, Tesla T4, tokenizer BPE 8k dùng chung.
+
+| | Case 1 Transformer | Case 2 Seq2Seq |
+|---|---|---|
+| BLEU greedy | 29.47 | 26.64 |
+| BLEU beam | 30.35 (beam=5) | 27.81 (beam=10) |
+| BLEU detok | 30.39 | 27.85 |
+| chrF2 | 48.85 | 46.55 |
+| Tham số | 39.7M | 20.0M |
+| Giây/epoch | 144 | 152 |
+| Epoch tốt nhất | 30 (chưa hội tụ) | 12 |
+| Kết thúc | hết 30 epoch | early stop ở 17 |
+
+Đối chiếu số đã công bố trên cùng tst2013:
 
 | Hệ thống | BLEU tokenized | Nguồn |
 |---|---|---|
@@ -163,8 +183,27 @@ này, nhưng không so được với hệ thống có tách từ tiếng Việt
 | `tensorflow/nmt`, beam=10 | 26.1 | [13] |
 | Transformers without Tears 2019 | 32.8 | [2] |
 
-Vùng kỳ vọng cho dự án này: Case 2 khoảng 25–27, Case 1 khoảng 28–31.
-`compare.py` in bảng này kèm kết quả đo được.
+Case 2 vượt chính bản gốc nó tái hiện (+1.7 ở beam=10), nhiều khả năng nhờ BPE
+thay cho vocab word-level 17k/7.7k và Adam thay cho SGD 1.0.
+
+Hai điểm cần nêu khi đọc bảng:
+
+Transformer hơn 2.5 BLEU nhưng dùng gấp đôi tham số. Nó cũng chưa hội tụ: dev
+BLEU vẫn tăng ở epoch cuối (26.11 → 26.42) và early stop chưa kích hoạt, nên
+train thêm sẽ còn lên. Seq2Seq thì đã hội tụ thật, đỉnh ở epoch 12 và early stop
+ở 17, train thêm không giúp gì.
+
+Thời gian mỗi epoch gần như bằng nhau, ngược với kỳ vọng thông thường rằng
+Transformer nhanh hơn nhiều nhờ song song hoá. Lý do: Seq2Seq chỉ có nửa số tham
+số nên nửa khối lượng tính toán mỗi token, bù lại đúng phần thiệt do input
+feeding chạy tuần tự; thêm nữa attention của Transformer tốn O(T²). Ở quy mô
+model này trên T4, hai yếu tố triệt tiêu nhau.
+
+Lúc sinh câu thì Transformer chậm hơn 37.7× (52.8 vs 1.4 ms/câu). Đây là hạn chế
+của bản cài đặt chứ không phải kiến trúc: `greedy_decode` không cache key/value
+nên mỗi bước phải chạy lại decoder trên toàn bộ tiền tố.
+
+![So sánh hai kiến trúc](results/comparison.png)
 
 ## Áp dụng từ literature
 
@@ -200,8 +239,9 @@ chiều En↔Vi và nhiều cấu hình hyper-parameter hơn.
 | Nguyen et al. 2019 [11] | Xác nhận rare word là đòn bẩy ở cặp En-Vi (giải bằng BPE) |
 
 [8] là nền tảng trực tiếp của `tensorflow/nmt`. Input feeding buộc decoder chạy
-tuần tự từng timestep, đó là nguồn gốc chênh lệch thời gian/epoch giữa hai case
-chứ không phải số tham số.
+tuần tự từng timestep, không song song hoá được như teacher forcing của
+Transformer. Về lý thuyết đây là bất lợi tốc độ, nhưng đo thực tế trên T4 thì
+hai case gần bằng nhau (152 vs 144 giây/epoch) — xem mục Kết quả.
 
 [9] tạo ra bộ dữ liệu này. Phần thích nghi miền (pre-train WMT → fine-tune TED,
 +3.8 BLEU) không áp dụng vì ta chỉ dùng dữ liệu trong miền.
