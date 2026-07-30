@@ -4,8 +4,9 @@ Cài đặt lại hai kiến trúc dịch máy trên cùng bộ IWSLT'15 En-Vi v
 
 Lê Hoàng Quân — MSV 24022433 · https://github.com/quanai06/machine_translate
 
-**[Báo cáo đầy đủ →](report/BAO_CAO.md)** · [Bảng so sánh chi tiết →](results/COMPARISON.md)
-· [Nhật ký lần chạy trên Colab →](notebooks/translate_colab_run.ipynb)
+**[Báo cáo (PDF) →](report/BAO_CAO.pdf)** · [nguồn LaTeX](report/BAO_CAO.tex) ·
+[bảng so sánh](results/COMPARISON.md) ·
+[nhật ký chạy Colab](notebooks/translate_colab_run.ipynb)
 
 | | Case 1 | Case 2 |
 |---|---|---|

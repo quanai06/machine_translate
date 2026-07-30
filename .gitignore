@@ -14,3 +14,10 @@ runs/*.png
 
 .ipynb_checkpoints/
 .DS_Store
+
+# File phụ do LaTeX sinh ra (PDF thì vẫn commit)
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.synctex.gz
