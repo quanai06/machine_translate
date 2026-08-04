@@ -48,7 +48,7 @@ class TransformerConfig:
     weight_decay: float = 1e-4
     label_smoothing: float = 0.1
     clip_norm: float = 1.0
-    patience: int = 5           # early stop nếu BLEU dev đứng yên 5 epoch
+    patience: int = 8           # early stop nếu BLEU dev đứng yên 8 epoch (cho hội tụ sâu hơn)
 
     # ---- decode ----
     beam_size: int = 5

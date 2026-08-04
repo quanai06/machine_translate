@@ -302,13 +302,6 @@ def run_training(
     best_bleu, best_epoch, patience = -1.0, -1, 0
     ckpt_path = output_dir / "best.pt"
     last_path = output_dir / "last.pt"
-    epoch_ckpt = output_dir / f"epoch_{epoch:03d}.pt"
-    torch.save({
-        "model": model.state_dict(),
-        "epoch": epoch,
-        "dev_bleu": dev_scores["bleu_tokenized"],
-        "config": vars(cfg),
-    }, epoch_ckpt)
     start_epoch = 1
 
     # Colab free hay ngắt phiên sau vài giờ. `last.pt` được ghi sau MỖI epoch
@@ -396,6 +389,14 @@ def run_training(
              "patience": patience, "history": rec.epochs, "config": vars(cfg)},
             last_path,
         )
+        # --- lưu checkpoint từng epoch để có thể average sau này ---
+        epoch_ckpt = output_dir / f"epoch_{epoch:03d}.pt"
+        torch.save({
+            "model": model.state_dict(),
+            "epoch": epoch,
+            "dev_bleu": dev_scores["bleu_tokenized"],
+            "config": vars(cfg),
+        }, epoch_ckpt)
         if stop_now:
             break
 
