@@ -38,7 +38,7 @@ class TransformerConfig:
     tie_embeddings: bool = True  # buộc embedding decoder với ma trận output
 
     # ---- tối ưu ----
-    epochs: int = 30
+    epochs: int = 60
     max_tokens: int = 8192      # số token target mỗi batch (T4 16GB chịu được)
     accum_steps: int = 1
     lr_scale: float = 2.0       # hệ số nhân cho lịch inverse-sqrt
