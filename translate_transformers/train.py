@@ -65,6 +65,8 @@ def main() -> None:
         warmup_steps=cfg.warmup_steps, scale=cfg.lr_scale,
     )
 
+    if getattr(cfg, "resume", False) and (Path(cfg.output_dir) / "last.pt").exists():
+        print("Phát hiện checkpoint cũ, sẽ train tiếp từ đó...")
     rec = run_training(
         model, cfg, splits["train"], splits["dev"], tok_tgt, device,
         optimizer=optimizer, scheduler=scheduler,
