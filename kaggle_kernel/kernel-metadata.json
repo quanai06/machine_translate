@@ -1,0 +1,16 @@
+{
+  "id": "leehoangquan006/nmt-envi-backtranslation",
+  "title": "nmt-envi-backtranslation",
+  "code_file": "kaggle_train.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "leehoangquan006/iwslt15-envi-data"
+  ],
+  "competition_sources": [],
+  "keywords": [],
+  "model_sources": []
+}
